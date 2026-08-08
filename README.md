@@ -1,6 +1,6 @@
 # cppdisplacementx
 
-[![CI](https://github.com/laiambryant/laiambryant-cppdisplacementx/actions/workflows/ci.yml/badge.svg)](https://github.com/laiambryant/laiambryant-cppdisplacementx/actions/workflows/ci.yml)
+[![CI](https://github.com/laiambryant/cppdisplacementx/actions/workflows/ci.yml/badge.svg)](https://github.com/laiambryant/cppdisplacementx/actions/workflows/ci.yml)
 [![C++17](https://img.shields.io/badge/C%2B%2B-17-00599C?logo=cplusplus&logoColor=white)](https://en.cppreference.com/w/cpp/17)
 ![Dependencies: none](https://img.shields.io/badge/dependencies-none-brightgreen)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
