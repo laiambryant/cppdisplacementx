@@ -26,3 +26,7 @@ enable_testing()
 add_executable(cppdx_tests tests/parity_tests.cpp)
 target_link_libraries(cppdx_tests PRIVATE cppdisplacementx)
 add_test(NAME parity COMMAND cppdx_tests)
+
+install(TARGETS cppdisplacementx ARCHIVE DESTINATION lib)
+install(DIRECTORY include/ DESTINATION include)
+install(FILES LICENSE README.md DESTINATION .)

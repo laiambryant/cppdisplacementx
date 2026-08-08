@@ -72,6 +72,17 @@ cmake --build build
 ctest --test-dir build
 ```
 
+## Releases
+
+Pushing a tag matching `v*.*.*` runs the full test matrix, builds and
+installs the library on Linux, Windows, and macOS, and publishes a GitHub
+Release with a source-plus-headers archive for each platform:
+
+```sh
+git tag v0.1.0
+git push origin v0.1.0
+```
+
 ## Licence
 
 GPL-3.0, matching its sibling repositories.
