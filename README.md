@@ -1,24 +1,36 @@
 # cppdisplacementx
 
+[![CI](https://github.com/laiambryant/laiambryant-cppdisplacementx/actions/workflows/ci.yml/badge.svg)](https://github.com/laiambryant/laiambryant-cppdisplacementx/actions/workflows/ci.yml)
+[![C++17](https://img.shields.io/badge/C%2B%2B-17-00599C?logo=cplusplus&logoColor=white)](https://en.cppreference.com/w/cpp/17)
+[![Dependencies: none](https://img.shields.io/badge/dependencies-none-brightgreen)](#)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
+
 Embeddable C++17 core of the Displacement X / JSplacement height-field
 generator. It is the in-process sibling of
 [godisplacementx](https://github.com/laiambryant/godisplacementx) (Go, CPU) and
 [gpudisplacementx](https://github.com/laiambryant/gpudisplacementx) (Rust, wgpu):
-same generator, no subprocess, no CLI.
+same generator, linked directly into a host binary, no subprocess and no CLI.
 
-It exists because a host that ships a game cannot spawn an executable. A
-library links into the host binary, so runtime generation survives being
-packaged — including on platforms where process spawning is not available at
-all. Its first consumer is the
-[procedural-city](https://github.com/laiambryant/procedural-city) Godot
-extension, which references this repository as a submodule.
+## Samples
 
-## What it is not
+| | |
+|---|---|
+| ![Grayscale height field](docs/images/sample-grayscale.png) | ![Colour gradient](docs/images/sample-color.png) |
+| Grayscale height field | Colour gradient (`OutputMode::COLOR`) |
+| ![Normal map](docs/images/sample-normal.png) | ![Dense layering](docs/images/sample-dense.png) |
+| Normal map (`OutputMode::NORMAL`) | Dense layering, all 16 composition modes |
 
-There is no image decoder, no file I/O, no rendering API and no threading
-policy beyond `std::thread`. The library has **zero dependencies**: the host
-decodes sprite PNGs, owns the GPU device, and writes the maps. That keeps the
-same core usable from an engine extension, a CLI or a test harness.
+All four are seeded, reproducible CPU renders at 320x320.
+
+## Features
+
+- Zero dependencies — the host decodes sprite PNGs, owns the GPU device, and
+  writes files; the library never touches the filesystem.
+- Deterministic: one seed produces one output, bit-identical across the CPU
+  and GPU backends.
+- Multithreaded CPU compositor with exact (non-approximate) SSE2 fast paths.
+- A ready-to-hand-off Vulkan GLSL compute shader for GPU compositing.
+- Grayscale, normal-map, and colour-gradient post-processing.
 
 ## Layout
 
@@ -35,31 +47,23 @@ same core usable from an engine extension, a CLI or a test harness.
 | `post.h` | Invert, gradient colouring, normal map |
 | `sprite_atlas.h` | Flat atlas the host fills with decoded sprites |
 
-## The determinism contract
+## Determinism
 
-One seed produces one city, on every backend and every machine. Three rules
-keep that true, and all three are load-bearing:
+One seed produces one output on every backend and every machine:
 
-1. **All randomness is in `command_list.cpp`.** Shaders and compositors consume
-   no RNG; they replay a flat, data-only command list.
-2. **The RNG stream is frozen.** The constants in `rng.cpp` are the same stream
-   gpudisplacementx uses. Changing one changes every seeded output ever made.
-   The stream is deliberately *not* godisplacementx's — the Go CLI is a
-   different aesthetic lineage, not a byte-parity target.
-3. **Every blend is integer-only.** No float appears between the command list
-   and the finished pixel, so a GPU and a CPU agree bit for bit. `blend.h` and
-   `composite_glsl.cpp` are line-for-line counterparts; editing one without the
-   other silently breaks backend parity.
+1. All randomness is generated in `command_list.cpp`; shaders and compositors
+   replay a flat, data-only command list and consume no RNG.
+2. The RNG stream in `rng.cpp` is byte-identical to gpudisplacementx's and
+   frozen — changing a constant changes every seeded output ever made.
+3. Every blend is integer-only. `blend.h` and `composite_glsl.cpp` are
+   line-for-line counterparts, and the SIMD paths in `simd_row_blend.h` are
+   cross-checked against the scalar path for every supported mode.
 
-The SIMD paths are held to the same standard. `simd_row_blend.h` is enabled
-only where the destination row is provably opaque and the mode collapses to
-`out = div255(sa * blend + (255 - sa) * dst)`, where every intermediate stays
-under 65536 and the 16-bit lanes reproduce the scalar result exactly. The test
-suite compares the two across every supported mode.
+`tests/parity_tests.cpp` covers all three.
 
 ## Building
 
-The library is normally compiled straight into the host's build (nine .cpp
+The library is normally compiled straight into the host's build (nine `.cpp`
 files, no configuration). For standalone work:
 
 ```sh
@@ -71,3 +75,8 @@ ctest --test-dir build
 ## Licence
 
 GPL-3.0, matching its sibling repositories.
+
+## Credits
+
+Part of the Displacement X family, a C++/Go/Rust reimplementation of
+[satelllte/displacementx](https://github.com/satelllte/displacementx).
