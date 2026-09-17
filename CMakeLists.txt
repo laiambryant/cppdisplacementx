@@ -21,11 +21,13 @@ add_library(cppdisplacementx STATIC
 target_include_directories(cppdisplacementx PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(cppdisplacementx PUBLIC Threads::Threads)
 
-enable_testing()
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+    enable_testing()
 
-add_executable(cppdx_tests tests/parity_tests.cpp)
-target_link_libraries(cppdx_tests PRIVATE cppdisplacementx)
-add_test(NAME parity COMMAND cppdx_tests)
+    add_executable(cppdx_tests tests/parity_tests.cpp)
+    target_link_libraries(cppdx_tests PRIVATE cppdisplacementx)
+    add_test(NAME parity COMMAND cppdx_tests)
+endif()
 
 install(TARGETS cppdisplacementx ARCHIVE DESTINATION lib)
 install(DIRECTORY include/ DESTINATION include)
