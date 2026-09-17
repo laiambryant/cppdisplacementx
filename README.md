@@ -159,24 +159,6 @@ properties hold that together:
 the command list against repeated seeding, and the SIMD rows against the scalar
 path for every supported mode.
 
-## Headers
-
-| Header | Responsibility |
-|---|---|
-| `engine.h` | `render_field_cpu`, the one-call CPU path |
-| `params.h` | Generator settings, composition-mode and sprite-pack tables |
-| `rng.h` | The frozen PCG32 stream |
-| `command_list.h` | Draw-command generation, and the only place randomness lives |
-| `draw_command.h` | The 64-byte command struct shared with the shader |
-| `canvas.h` | RGBA8 pixel buffer |
-| `blend.h` | Integer-only blend math, mirror of the compute shader |
-| `simd_row_blend.h` | SSE2 fast paths, guarded and exact |
-| `cpu_compositor.h` | Ordered, multithreaded CPU backend |
-| `tile_bins.h` | 32x32 tile binning for the tiled shader |
-| `composite_glsl.h` | Vulkan GLSL compute source for a GPU backend |
-| `post.h` | Invert, gradient colouring, normal map |
-| `sprite_atlas.h` | Flat atlas the host fills with decoded sprites |
-
 ## Building the tests
 
 ```sh
@@ -205,5 +187,5 @@ GPL-3.0, matching its sibling repositories. See [LICENSE](LICENSE).
 
 ## Credits
 
-Part of the Displacement X family, a C++/Go/Rust reimplementation of
-[satelllte/displacementx](https://github.com/satelllte/displacementx).
+Thanks to 
+[satelllte/displacementx](https://github.com/satelllte/displacementx), their implementation is the main inspiration for this repository.
